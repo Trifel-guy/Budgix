@@ -1,0 +1,66 @@
+version: "3.9"
+
+# ── Production environment ────────────────────────────────────────────────────
+# Note: In production, PostgreSQL should be a managed service (RDS, Supabase, etc.)
+# This file uses a containerized DB only as a fallback reference.
+
+services:
+  migrate:
+    image: ${DOCKER_REGISTRY}/budgix-backend:${IMAGE_TAG}
+    env_file: .env.prod
+    command: alembic upgrade head
+    restart: "no"
+
+  backend:
+    image: ${DOCKER_REGISTRY}/budgix-backend:${IMAGE_TAG}
+    restart: always
+    env_file: .env.prod
+    environment:
+      ENVIRONMENT: production
+      DEBUG: "false"
+    deploy:
+      replicas: 3
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: rolling-update
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    image: ${DOCKER_REGISTRY}/budgix-frontend:${IMAGE_TAG}
+    restart: always
+
+  nginx:
+    image: nginx:1.25-alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_conf:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+      - frontend
+
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_conf:/etc/letsencrypt
+
+volumes:
+  certbot_www:
+  certbot_conf:
