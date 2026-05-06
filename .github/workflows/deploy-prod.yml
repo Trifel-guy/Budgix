@@ -11,8 +11,8 @@ on:
         description: "Type 'deploy' to confirm"
         required: true
 
-env:
-  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+# env:
+  # DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
 
 jobs:
   validate:
@@ -45,6 +45,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase Docker registry
+        run: |
+          OWNER_LOWERCASE="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "DOCKER_REGISTRY=ghcr.io/${OWNER_LOWERCASE}" >> "$GITHUB_ENV"
+    
       - name: Tag images as prod-latest
         run: |
           docker pull ${{ env.DOCKER_REGISTRY }}/budgix-backend:${{ github.event.inputs.image_tag }}

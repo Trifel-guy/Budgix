@@ -20,7 +20,7 @@ def platform_stats(
 ):
     """Platform-wide statistics."""
     total_users = db.query(func.count(User.id)).scalar()
-    active_users = db.query(func.count(User.id)).filter(User.is_active == True).scalar()
+    active_users = db.query(func.count(User.id)).filter(User.is_active is True).scalar()
     total_transactions = db.query(func.count(Transaction.id)).scalar()
     total_volume = db.query(func.coalesce(func.sum(Transaction.amount), 0)).scalar()
 

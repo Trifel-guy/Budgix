@@ -1,5 +1,4 @@
 from io import BytesIO
-from datetime import date
 from decimal import Decimal, InvalidOperation
 
 import pandas as pd
