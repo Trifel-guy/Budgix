@@ -57,32 +57,32 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      - name: Check required secrets
-        run: |
-          test -n "${{ secrets.INT_HOST }}" || (echo "INT_HOST is missing" && exit 1)
-          test -n "${{ secrets.INT_USER }}" || (echo "INT_USER is missing" && exit 1)
-          test -n "${{ secrets.INT_SSH_KEY }}" || (echo "INT_SSH_KEY is missing" && exit 1)
-          test -n "${{ secrets.INT_URL }}" || (echo "INT_URL is missing" && exit 1)
+      # - name: Check required secrets
+      #   run: |
+      #     test -n "${{ secrets.INT_HOST }}" || (echo "INT_HOST is missing" && exit 1)
+      #     test -n "${{ secrets.INT_USER }}" || (echo "INT_USER is missing" && exit 1)
+      #     test -n "${{ secrets.INT_SSH_KEY }}" || (echo "INT_SSH_KEY is missing" && exit 1)
+      #     test -n "${{ secrets.INT_URL }}" || (echo "INT_URL is missing" && exit 1)
 
-      - name: Deploy to Staging server
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ${{ secrets.STAGING_USER }}
-          key: ${{ secrets.STAGING_SSH_KEY }}
-          script: |
-            cd /opt/budgix
-            export DOCKER_REGISTRY=${{ env.DOCKER_REGISTRY }}
-            export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            docker compose -f docker-compose.staging.yml pull
-            docker compose -f docker-compose.staging.yml up -d --remove-orphans
-            docker image prune -f
+      # - name: Deploy to Staging server
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.STAGING_HOST }}
+      #     username: ${{ secrets.STAGING_USER }}
+      #     key: ${{ secrets.STAGING_SSH_KEY }}
+      #     script: |
+      #       cd /opt/budgix
+      #       export DOCKER_REGISTRY=${{ env.DOCKER_REGISTRY }}
+      #       export IMAGE_TAG=${{ env.IMAGE_TAG }}
+      #       docker compose -f docker-compose.staging.yml pull
+      #       docker compose -f docker-compose.staging.yml up -d --remove-orphans
+      #       docker image prune -f
 
-      - name: Health check
-        run: |
-          sleep 20
-          curl --fail ${{ secrets.STAGING_URL }}/health || exit 1
+      # - name: Health check
+      #   run: |
+      #     sleep 20
+      #     curl --fail ${{ secrets.STAGING_URL }}/health || exit 1
 
-      - name: Notify on failure
-        if: failure()
-        run: echo "::error::Staging deployment failed for ${{ env.IMAGE_TAG }}"
+      # - name: Notify on failure
+      #   if: failure()
+      #   run: echo "::error::Staging deployment failed for ${{ env.IMAGE_TAG }}"

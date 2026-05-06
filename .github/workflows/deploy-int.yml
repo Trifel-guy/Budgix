@@ -61,28 +61,28 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       
-      - name: Check required secrets
-        run: |
-          test -n "${{ secrets.INT_HOST }}" || (echo "INT_HOST is missing" && exit 1)
-          test -n "${{ secrets.INT_USER }}" || (echo "INT_USER is missing" && exit 1)
-          test -n "${{ secrets.INT_SSH_KEY }}" || (echo "INT_SSH_KEY is missing" && exit 1)
-          test -n "${{ secrets.INT_URL }}" || (echo "INT_URL is missing" && exit 1)
+      # - name: Check required secrets
+      #   run: |
+      #     test -n "${{ secrets.INT_HOST }}" || (echo "INT_HOST is missing" && exit 1)
+      #     test -n "${{ secrets.INT_USER }}" || (echo "INT_USER is missing" && exit 1)
+      #     test -n "${{ secrets.INT_SSH_KEY }}" || (echo "INT_SSH_KEY is missing" && exit 1)
+      #     test -n "${{ secrets.INT_URL }}" || (echo "INT_URL is missing" && exit 1)
 
-      - name: Deploy to INT server
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.INT_HOST }}
-          username: ${{ secrets.INT_USER }}
-          key: ${{ secrets.INT_SSH_KEY }}
-          script: |
-            cd /opt/budgix
-            export DOCKER_REGISTRY=${{ env.DOCKER_REGISTRY }}
-            export IMAGE_TAG=${{ env.IMAGE_TAG }}
-            docker compose -f docker-compose.int.yml pull
-            docker compose -f docker-compose.int.yml up -d --remove-orphans
-            docker image prune -f
+      # - name: Deploy to INT server
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.INT_HOST }}
+      #     username: ${{ secrets.INT_USER }}
+      #     key: ${{ secrets.INT_SSH_KEY }}
+      #     script: |
+      #       cd /opt/budgix
+      #       export DOCKER_REGISTRY=${{ env.DOCKER_REGISTRY }}
+      #       export IMAGE_TAG=${{ env.IMAGE_TAG }}
+      #       docker compose -f docker-compose.int.yml pull
+      #       docker compose -f docker-compose.int.yml up -d --remove-orphans
+      #       docker image prune -f
 
-      - name: Health check
-        run: |
-          sleep 15
-          curl --fail ${{ secrets.INT_URL }}/health || exit 1
+      # - name: Health check
+      #   run: |
+      #     sleep 15
+      #     curl --fail ${{ secrets.INT_URL }}/health || exit 1
