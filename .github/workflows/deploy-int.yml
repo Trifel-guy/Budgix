@@ -2,7 +2,7 @@ name: Deploy → Integration
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 env:
   DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
