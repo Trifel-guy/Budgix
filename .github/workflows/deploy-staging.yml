@@ -56,6 +56,13 @@ jobs:
           build-args: VITE_API_URL=/api/v1
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      
+      - name: Check required secrets
+        run: |
+          test -n "${{ secrets.INT_HOST }}" || (echo "INT_HOST is missing" && exit 1)
+          test -n "${{ secrets.INT_USER }}" || (echo "INT_USER is missing" && exit 1)
+          test -n "${{ secrets.INT_SSH_KEY }}" || (echo "INT_SSH_KEY is missing" && exit 1)
+          test -n "${{ secrets.INT_URL }}" || (echo "INT_URL is missing" && exit 1)
 
       - name: Deploy to Staging server
         uses: appleboy/ssh-action@v1
